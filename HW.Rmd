@@ -3,8 +3,8 @@ title: "HW #6 – Economic Development"
 author: "Caleb C"
 date: "10/22/2025"
 output:
-  pdf_document: 
-    extra_dependencies: ["mathtools", "amsmath", "amsfonts"]
+  pdf_document:
+    extra_dependencies: ["mathtools", "amsmath", "amsfonts", "float"]
   html_document:
     df_print: paged
 subtitle: "Select Questions from Chapter 7 and 8"
@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 library(dplyr)
 library(tibble)
 library(ggplot2)
+library(kableExtra)
 ```
 
 # Chapter 7 – Measuring Productivity
@@ -146,14 +147,15 @@ knitr::kable(
                   "\\protect$\\hat{k}$ (\\%)", 
                   "\\protect$\\hat{h}$ (\\%)", 
                   "\\protect$\\hat{FA}$ (\\%)", 
-                  "\\protect$\\hat{A}$ (\\%)", 
-                  "FA Share of Growth (\\%)", 
+                  "\\protect$\\hat{A}$ (\\%)",
+                  "FA Share of Growth (\\%)",
                   "TFP Share of Growth (\\%)"),
     caption = "Question 6 – Growth rate decomposition, 1975‑2017",
   format = "latex",
   booktabs = TRUE,
   escape = FALSE
-)
+  ) |>
+  kable_styling(latex_options = "HOLD_position")
 ```
 
 **Interpretation**  
