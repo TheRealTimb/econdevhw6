@@ -270,25 +270,63 @@ theme_minimal()
 
 Parameters: \(L=1,\;\mu=5\).  Initially \(\gamma_A=0.5\) then *permanently* raised to \(0.75\).
 
+**Model facts from §8.3**
+
+* Per-worker output: \(y = \tilde{A}\,(1-\gamma_A)\).
+* With a constant \(\gamma_A\), technology grows at \(\hat{A} = \tfrac{\gamma_A}{\mu}\).
+* Hence \(\hat{y} = \tfrac{\gamma_A}{\mu}\) in the balanced-growth path.
+
+**Step 1 – Initial growth rate**
+
+With \(L=1\), \(\mu = 5\), and \(\gamma_A = 0.5\):
+\[
+  \hat{y}_0 = \frac{0.5}{5} = 0.10 \;\Rightarrow\; 10\%\text{ per year.}
+\]
+
+**Step 2 – Raise \(\gamma_A\) to 0.75**
+
+* *Impact effect on output:* \(y = \tilde{A}\,(1-\gamma_A)\) falls from \(\tilde{A}(1-0.5) = 0.5\tilde{A}\) to \(\tilde{A}(1-0.75) = 0.25\tilde{A}\), a **50 % drop**.
+* *New growth rate:* \(\hat{y}_{\text{new}} = \tfrac{0.75}{5} = 0.15\) ⇒ 15 % per year.
+
+The higher research share therefore produces a discrete fall in output but accelerates growth.
+
+**Step 3 – Catch-up time**
+
+Let \(t\) be the number of years after the policy change.  The new path overtakes the old one when
+\[
+  (1-\gamma_A^{\text{new}})\bigl(1 + \hat{y}_{\text{new}}\bigr)^t
+  = (1-\gamma_A^{\text{old}})\bigl(1 + \hat{y}_{\text{old}}\bigr)^t.
+\]
+Solving,
+\[
+  t = \frac{\ln\bigl(\tfrac{1-\gamma_A^{\text{old}}}{1-\gamma_A^{\text{new}}}\bigr)}{\ln\bigl(\tfrac{1+\hat{y}_{\text{new}}}{1+\hat{y}_{\text{old}}}\bigr)}
+  \approx \frac{\ln 2}{\ln (1.15/1.10)} \approx 15.6\ \text{years}.
+\]
+The “rule of 72” gives a similar back-of-the-envelope check: at a 4.545 percentage-point growth differential, the gap closes in roughly 15.8 years.
+
 ```{r q4_numeric}
 mu        <- 5
 gamma_old <- 0.50
 gamma_new <- 0.75
 
-# (i) Growth rates of productivity and output per worker
-g_A_old <- mu * gamma_old        # 2.5 % per year
-g_A_new <- mu * gamma_new        # 3.75 % per year
+# (i) Growth rates of productivity and output per worker (equal to γ_A / μ)
+g_A_old <- gamma_old / mu        # 10 % per year
+g_A_new <- gamma_new / mu        # 15 % per year
 
 # (ii) Instantaneous output drop (smaller production labor share)
-drop <- (1 - gamma_new) / (1 - gamma_old)  # 50 % fall
+drop_ratio <- (1 - gamma_new) / (1 - gamma_old)  # y_new(0) / y_old(0) = 0.25 / 0.50 = 0.5
 
-# (iii) Time until the new path catches up with the old path
-delta_g <- g_A_new - g_A_old      # 1.25 pp faster
-time_yrs <- log(1 / drop) / delta_g   # ln(2)/1.25 approx. 0.55 years
-round(c(g_A_old = g_A_old, g_A_new = g_A_new, catch_up_years = time_yrs), 3)
+# (iii) Time until the new path catches up with the old path (discrete compounding)
+catch_up_years <- log((1 - gamma_old) / (1 - gamma_new)) /
+  log((1 + g_A_new) / (1 + g_A_old))
+
+round(c(g_A_old = g_A_old,
+        g_A_new = g_A_new,
+        drop_ratio = drop_ratio,
+        catch_up_years = catch_up_years), 3)
 ```
 
-Hence **output initially halves** but, because productivity now grows 1.25 pp faster, the economy regains the lost ground in **about 0.55 years (about 7 months)** and thereafter stays ahead.
+Output per worker **falls by one-half on impact** because the share of labor diverted to R&D rises, yet it subsequently grows faster. With technology growing at 15 % instead of 10 %, the economy needs roughly **15.6 years** for the high-R&D path to catch up to (and then exceed) the old trajectory.
 
 ---
 
