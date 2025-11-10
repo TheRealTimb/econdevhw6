@@ -272,28 +272,37 @@ Parameters: \(L=1,\;\mu=5\).  Initially \(\gamma_A=0.5\) then *permanently* rais
 
 **Model facts from §8.3**
 
-* Per-worker output: \(y = A(1-\gamma_A)\).
-* With a constant \(\gamma_A\), \(\hat{A} = \tfrac{\gamma_A}{\mu}\).
-* Technology growth: \(\hat{y} = \tfrac{\gamma_A}{\mu}\).
+* Per-worker output: \(y = \tilde{A}\,(1-\gamma_A)\).
+* With a constant \(\gamma_A\), technology grows at \(\hat{A} = \tfrac{\gamma_A}{\mu}\).
+* Hence \(\hat{y} = \tfrac{\gamma_A}{\mu}\) in the balanced-growth path.
 
-1. **Initial growth rate.**
-   With \(L = 1\), \(\mu = 5\), \(\gamma_A = 0.5\):
-   \[
-   \hat{y}_0 = \frac{0.5}{5} = 0.10 \;\Rightarrow\; 10\%\;\text{per year}.
-   \]
+**Step 1 – Initial growth rate**
 
-2. **Raise \(\gamma_A\) to \(0.75\).**
-   * Immediate level effect: \(y = A(1-\gamma_A)\) falls from \(A(1-0.5) = 0.5A\) to \(A(1-0.75) = 0.25A\), a **50 % output drop**.
-   * Higher growth: \(\hat{y}_{\text{new}} = \tfrac{0.75}{5} = 0.15 = 15\%\) per year.
+With \(L=1\), \(\mu = 5\), and \(\gamma_A = 0.5\):
+\[
+  \hat{y}_0 = \frac{0.5}{5} = 0.10 \;\Rightarrow\; 10\%\text{ per year.}
+\]
 
-3. **Catch-up time.**
-   Let \(t\) be the years after the change. Counterfactual (no change): \(y_{\text{old}}(t) = 0.5A(1.10)^t\). New path: \(y_{\text{new}}(t) = 0.25A(1.15)^t\).
-   Solve \(0.25A(1.15)^t = 0.5A(1.10)^t\):
-   \[
-   (1.15)^t = 2(1.10)^t \quad\Rightarrow\quad t = \frac{\ln 2}{\ln(1.15) - \ln(1.10)} \approx 15.6\;\text{years}.
-   \]
+**Step 2 – Raise \(\gamma_A\) to 0.75**
 
-Thus the higher \(\gamma_A\) path sacrifices half of current output, but the faster growth closes the gap in roughly 15.6 years and then surpasses the old trajectory.
+* *Impact effect on output:* \(y = \tilde{A}\,(1-\gamma_A)\) falls from \(\tilde{A}(1-0.5) = 0.5\tilde{A}\) to \(\tilde{A}(1-0.75) = 0.25\tilde{A}\), a **50 % drop**.
+* *New growth rate:* \(\hat{y}_{\text{new}} = \tfrac{0.75}{5} = 0.15\) ⇒ 15 % per year.
+
+The higher research share therefore produces a discrete fall in output but accelerates growth.
+
+**Step 3 – Catch-up time**
+
+Let \(t\) be the number of years after the policy change.  The new path overtakes the old one when
+\[
+  (1-\gamma_A^{\text{new}})\bigl(1 + \hat{y}_{\text{new}}\bigr)^t
+  = (1-\gamma_A^{\text{old}})\bigl(1 + \hat{y}_{\text{old}}\bigr)^t.
+\]
+Solving,
+\[
+  t = \frac{\ln\bigl(\tfrac{1-\gamma_A^{\text{old}}}{1-\gamma_A^{\text{new}}}\bigr)}{\ln\bigl(\tfrac{1+\hat{y}_{\text{new}}}{1+\hat{y}_{\text{old}}}\bigr)}
+  \approx \frac{\ln 2}{\ln (1.15/1.10)} \approx 15.6\ \text{years}.
+\]
+The “rule of 72” gives a similar back-of-the-envelope check: at a 4.545 percentage-point growth differential, the gap closes in roughly 15.8 years.
 
 ```{r q4_numeric}
 mu        <- 5
