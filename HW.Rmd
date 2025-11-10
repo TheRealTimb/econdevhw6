@@ -332,21 +332,21 @@ Output per worker **falls by one-half on impact** because the share of labor div
 
 ### Question 5 – Two‑Country Model with Cost of Copying
 
-The follower’s *copying cost* is \(\mu_c = \mu_i\,(A_1/A_2)^{-\beta}\) with \(0<\beta<1\), equal labor forces, and technology‑creation intensity \(\gamma_{A,i}\).  At steady state the two technology growth rates are equal:
+The follower’s *copying cost* is \(\mu_c = \mu_i\,(A_1/A_2)^{\beta}\) with \(0<\beta<1\).  With equal labor forces \((L_1=L_2=L)\) the Romer production structure delivers growth rates
 
 \[
-\mu_i \gamma_{A,1} = \mu_i \gamma_{A,2} + \mu_i\,(A_1/A_2)^{-\beta} 
-\quad\Rightarrow\quad
-\bigl(\tfrac{A_1}{A_2}\bigr)^{-\beta} = \gamma_{A,1}-\gamma_{A,2}.
+\hat{A}_1 = \frac{\gamma_{A,1}}{\mu_i},
+\qquad
+\hat{A}_2 = \frac{\gamma_{A,2}}{\mu_c} = \frac{\gamma_{A,2}}{\mu_i}\Bigl(\frac{A_2}{A_1}\Bigr)^{\!\beta}.
 \]
 
-Therefore the **steady‑state technology ratio** is
+In the steady state the two growth rates are equal.  Solving \(\hat{A}_1 = \hat{A}_2\) gives the **steady‑state technology gap** highlighted in the lecture slides:
 
 \[
-\boxed{\displaystyle \frac{A_1}{A_2} = (\gamma_{A,1}-\gamma_{A,2})^{-1/\beta}}.
+\boxed{\displaystyle \frac{A_1}{A_2} = \Bigl(\frac{\gamma_{A,1}}{\gamma_{A,2}}\Bigr)^{\!1/\beta}}.
 \]
 
-*Comparative statics:* A *smaller* \(\beta\) (flatter copying‑cost curve) implies a **larger** steady‑state gap because copying becomes cheaper when the gap is wide.
+*Comparative statics:* A higher \(\gamma_{A,1}\) or a lower \(\gamma_{A,2}\) widens the long‑run gap, while a larger \(\beta\) (steeper imitation cost) reduces the gap because follower growth reacts more strongly to technology differences.
 
 #### Numerical Example
 
@@ -354,13 +354,53 @@ Parameters: \(\beta=1/2,\;\mu_i=10,\;\gamma_{A,1}=0.2,\;\gamma_{A,2}=0.1\).
 
 ```{r q5_numeric}
 beta <- 0.5
-g1   <- 0.2
-g2   <- 0.1
-A_ratio <- (g1 - g2)^(-1/beta)  # = 100
-A_ratio
+gamma_leader   <- 0.2
+gamma_follower <- 0.1
+mu_i           <- 10
+
+ratio_star <- (gamma_leader / gamma_follower)^(1 / beta)
+g_leader    <- gamma_leader / mu_i
+g_follower  <- gamma_follower / (mu_i * ratio_star^beta)
+
+c(ratio_star = ratio_star,
+  g_leader    = g_leader,
+  g_follower  = g_follower)
 ```
 
-Country 1 ends up with **A_1/A_2 = 100**, the leader’s technology level is two orders of magnitude higher than the follower’s.
+Country 1 sustains a technology level four times higher than Country 2, and both grow at \(\hat{A} = \gamma_{A,1}/\mu_i = \gamma_{A,2}/\mu_c = 2\%\) per year in the balanced path.
+
+```{r q5_growth_paths, fig.cap="Question 5 – Transition of growth rates with imitation-driven convergence"}
+lambda      <- 0.18                 # speed of convergence
+T           <- 40                   # horizon in years
+ratio_0     <- 9                    # initial tech gap (leader 9× ahead)
+
+time_grid   <- 0:(T - 1)
+ratio_path  <- ratio_star + (ratio_0 - ratio_star) * exp(-lambda * time_grid)
+
+g_base      <- gamma_follower / mu_i
+g1_path     <- rep(g_leader, T)
+g2_path     <- g_base + (ratio_path / ratio_star)^beta * (g_leader - g_base)
+
+growth_paths <- tibble(
+  year = time_grid,
+  `Country 1` = g1_path,
+  `Country 2` = g2_path,
+  `A_1/A_2`   = ratio_path
+)
+
+growth_paths |>
+  select(year, `Country 1`, `Country 2`) |>
+  pivot_longer(-year, names_to = "Country", values_to = "growth") |>
+  ggplot(aes(x = year, y = 100 * growth, colour = Country)) +
+  geom_line(size = 1.1) +
+  geom_hline(yintercept = 100 * g_leader, linetype = "dashed", colour = "grey40") +
+  labs(x = "Years after t = 0",
+       y = "Growth rate of technology (%)",
+       colour = NULL) +
+  theme_minimal()
+```
+
+The path mirrors Figure 8.3: the leader’s growth rate stays flat at 2 %, whereas the follower initially grows faster (≈2.5 %) while the gap is wide, then gradually converges downward as imitation becomes costlier and the technology ratio tends to its steady-state value.
 
 ---
 
