@@ -1,13 +1,13 @@
 ---
-title: "HW #6 – Economic Development"
-author: "Caleb C"
+title: "HW #6 – ECON 4100: Economic Development"
+author: "Caleb Cayouette"
 date: "10/22/2025"
 output:
   pdf_document:
     extra_dependencies: ["mathtools", "amsmath", "amsfonts", "float"]
   html_document:
     df_print: paged
-subtitle: "Select Questions from Chapter 7 and 8"
+subtitle: "Select Questions from Ashraf & Weil (2025): Chapters 7 and 8"
 ---
 
 ```{r setup, include=FALSE}
@@ -20,6 +20,8 @@ library(dplyr)
 library(tibble)
 library(ggplot2)
 library(kableExtra)
+library(latex2exp)
+library(grid)
 ```
 
 # Chapter 7 – Measuring Productivity
@@ -49,8 +51,6 @@ Under this specification:
   \]
   isolating the portion of income differences that cannot be explained by factor inputs alone.  
 
-A logarithmic decomposition of \(\ln y = \ln F + \ln A\) allows us to express the percentage contribution of inputs and productivity to each country’s income gap vis-à-vis the United States.
-
 **Calculation**
 \vspace{-10pt}
 ```{r q5_data}
@@ -65,8 +65,8 @@ countries <- tribble(             # input given data
   mutate(                                   # desired calculations 
     Factor_Accum = k^alpha * h^(1 - alpha),
     Productivity = y / Factor_Accum,
-    Factor_Share = 100 * log(Factor_Accum) / log(y),
-    Prod_Share   = 100 * log(Productivity) / log(y)
+    Factor_Share = 100 * Factor_Accum / y,
+    Prod_Share   = 100 * Productivity / y 
   )
 ```
 
@@ -77,14 +77,14 @@ knitr::kable(             # table output
            `Factor Accum.` = Factor_Accum,
            Productivity,
            `Factor Share (%)`  = Factor_Share,
-           `Prod. Share (%)`   = Prod_Share),
-  digits = 3,
+           `Prod. Share (%)`  = Prod_Share),
+  digits = 2,
   caption = "Question 5 – Decomposing the 2017 income gap relative to the United States"
 )
 ```
 
 **Interpretation**  
-Pakistan’s gap is 71 % factor‑driven, whereas the Netherlands’ gap is 87 % TFP‑driven; Paraguay lies between, with roughly a 50‑50 split. Therefore, factor accumulation plays the largest role in explaining income relative to the United States in Pakistan; productivity plays the largest role in explaining income relative to the United States in the Netherlands.
+Factor accumulation plays the largest role in explaining income relative to the United States in Paraguay; productivity plays the largest role in explaining income relative to the United States in the Pakistan.
 
 ---
 
@@ -133,7 +133,7 @@ tbl <- tbl |>
     g_FA = alpha * g_k + (1 - alpha) * g_h, # Factor accumulaton growth
     g_A = g_y - g_FA,                       # TFP growth
     share_FA = 100 * g_FA / g_y, # % of growth due to FA
-    share_A = 100 * g_A / g_y # % of growth due to TFP
+    share_A = 100 * g_A / g_y  # % of growth due to TFP
 )
 ```
 
@@ -213,7 +213,7 @@ t_end      <- 20                 # shock ends
 mu         <- 10                 # idea price
 A0         <- 1                  # initial productivity
 
-# γ_A path
+# gamma_A path
 gammaA <- rep(gamma_base, T)
 gammaA[(t_start+1):(t_end)] <- gamma_high      # R uses 1-indexing
 
@@ -272,21 +272,22 @@ Parameters: \(L=1,\;\mu=5\).  Initially \(\gamma_A=0.5\) then *permanently* rais
 
 **Model facts from §8.3**
 
-* Per-worker output: \(y = \tilde{A}\,(1-\gamma_A)\).
+* Per-worker output: \(y = A\,(1-\gamma_A)\).
 * With a constant \(\gamma_A\), technology grows at \(\hat{A} = \tfrac{\gamma_A}{\mu}\).
-* Hence \(\hat{y} = \tfrac{\gamma_A}{\mu}\) in the balanced-growth path.
+* Hence \(\hat{y} = \tfrac{\gamma_A}{\mu}\) in the balanced growth path.
 
 **Step 1 – Initial growth rate**
 
 With \(L=1\), \(\mu = 5\), and \(\gamma_A = 0.5\):
 \[
-  \hat{y}_0 = \frac{0.5}{5} = 0.10 \;\Rightarrow\; 10\%\text{ per year.}
+  \hat{y}_{\text{old}} = \frac{0.5}{5} = 0.10 \;\Rightarrow\; 10\%\text{ per year.}
 \]
 
 **Step 2 – Raise \(\gamma_A\) to 0.75**
 
-* *Impact effect on output:* \(y = \tilde{A}\,(1-\gamma_A)\) falls from \(\tilde{A}(1-0.5) = 0.5\tilde{A}\) to \(\tilde{A}(1-0.75) = 0.25\tilde{A}\), a **50 % drop**.
-* *New growth rate:* \(\hat{y}_{\text{new}} = \tfrac{0.75}{5} = 0.15\) ⇒ 15 % per year.
+* *Impact effect on output per worker:* \(y_{\text{old}} = A(1 - \gamma) = A(1 - 0.5) = A(0.5)\\ y_{\text{new}} = A(1 - \gamma) = A(1 - 0.75) = A(0.25)\)
+, a 50 % drop.
+* *New growth rate:* \(\hat{y}_{\text{new}} = \tfrac{0.75}{5} = 0.15\) $\Rightarrow$ 15 % per year.
 
 The higher research share therefore produces a discrete fall in output but accelerates growth.
 
@@ -294,113 +295,187 @@ The higher research share therefore produces a discrete fall in output but accel
 
 Let \(t\) be the number of years after the policy change.  The new path overtakes the old one when
 \[
-  (1-\gamma_A^{\text{new}})\bigl(1 + \hat{y}_{\text{new}}\bigr)^t
-  = (1-\gamma_A^{\text{old}})\bigl(1 + \hat{y}_{\text{old}}\bigr)^t.
+   \hat{y}_{\text{new}}\,(1+g)^t =  \hat{y}_{\text{old}}
 \]
-Solving,
+Substituting given values,
 \[
-  t = \frac{\ln\bigl(\tfrac{1-\gamma_A^{\text{old}}}{1-\gamma_A^{\text{new}}}\bigr)}{\ln\bigl(\tfrac{1+\hat{y}_{\text{new}}}{1+\hat{y}_{\text{old}}}\bigr)}
-  \approx \frac{\ln 2}{\ln (1.15/1.10)} \approx 15.6\ \text{years}.
+  A(0.25)(1+0.15)^t = A(0.50).
 \]
-The “rule of 72” gives a similar back-of-the-envelope check: at a 4.545 percentage-point growth differential, the gap closes in roughly 15.8 years.
+Solving for $t$,
+\[
+  t\,\textup{ln}(1.15) = \textup{ln}(2).
+\]
 
 ```{r q4_numeric}
 mu        <- 5
 gamma_old <- 0.50
-gamma_new <- 0.75
+gamma_new <- 0.25
 
-# (i) Growth rates of productivity and output per worker (equal to γ_A / μ)
-g_A_old <- gamma_old / mu        # 10 % per year
-g_A_new <- gamma_new / mu        # 15 % per year
+# (i) Growth rate of productivity and output per worker (equal to gamma_A / mu)
+g_A <- 0.15      # 15 % per year
 
-# (ii) Instantaneous output drop (smaller production labor share)
-drop_ratio <- (1 - gamma_new) / (1 - gamma_old)  # y_new(0) / y_old(0) = 0.25 / 0.50 = 0.5
+# (ii) Time until the new path catches up with the old path (discrete compounding)
+catch_up_years <- log(gamma_old / gamma_new) /
+                  log(1 + g_A)
 
-# (iii) Time until the new path catches up with the old path (discrete compounding)
-catch_up_years <- log((1 - gamma_old) / (1 - gamma_new)) /
-  log((1 + g_A_new) / (1 + g_A_old))
-
-round(c(g_A_old = g_A_old,
-        g_A_new = g_A_new,
-        drop_ratio = drop_ratio,
+round(c(
+        g_A = g_A,
         catch_up_years = catch_up_years), 3)
 ```
 
-Output per worker **falls by one-half on impact** because the share of labor diverted to R&D rises, yet it subsequently grows faster. With technology growing at 15 % instead of 10 %, the economy needs roughly **15.6 years** for the high-R&D path to catch up to (and then exceed) the old trajectory.
+Output per worker **falls by one-half on impact** because the share of labor diverted to R&D rises, yet it subsequently grows faster. With technology growing at 15 % instead of 10 %, the economy needs roughly **5 years** for the high-R&D path to catch up to (and then exceed) the old trajectory.
 
 ---
 
-### Question 5 – Two‑Country Model with Cost of Copying
+### Question 5 – Two‑Country Model with Rise in $\gamma_{A,1}$
 
-The follower’s *copying cost* is \(\mu_c = \mu_i\,(A_1/A_2)^{\beta}\) with \(0<\beta<1\).  With equal labor forces \((L_1=L_2=L)\) the Romer production structure delivers growth rates
+```{r q5_graph_2, echo=FALSE}
 
-\[
-\hat{A}_1 = \frac{\gamma_{A,1}}{\mu_i},
-\qquad
-\hat{A}_2 = \frac{\gamma_{A,2}}{\mu_c} = \frac{\gamma_{A,2}}{\mu_i}\Bigl(\frac{A_2}{A_1}\Bigr)^{\!\beta}.
-\]
+## 1.  Data ---------------------------------------------------------
+df <- tibble(A_ratio = seq(1, 4, length.out = 300)) |>
+  mutate(                                # single convex curve
+    gA = 0.06 + 0.18 * (A_ratio - 1) + 0.025 * (A_ratio - 1)^2
+  )
 
-In the steady state the two growth rates are equal.  Solving \(\hat{A}_1 = \hat{A}_2\) gives the **steady‑state technology gap** highlighted in the lecture slides:
+steady_old <- 0.32          # original steady-state growth rate  Â₁
+steady_new <- steady_old + 0.10   # higher steady-state level    Â₂
 
-\[
-\boxed{\displaystyle \frac{A_1}{A_2} = \Bigl(\frac{\gamma_{A,1}}{\gamma_{A,2}}\Bigr)^{\!1/\beta}}.
-\]
+# x-coordinates where the curve meets each horizontal line
+old_ss <- with(df, approx(gA, A_ratio, xout = steady_old)$y)
+new_ss <- with(df, approx(gA, A_ratio, xout = steady_new)$y)
 
-*Comparative statics:* A higher \(\gamma_{A,1}\) or a lower \(\gamma_{A,2}\) widens the long‑run gap, while a larger \(\beta\) (steeper imitation cost) reduces the gap because follower growth reacts more strongly to technology differences.
+y_max <- max(df$gA)
 
-#### Numerical Example
+## 2.  Plot ---------------------------------------------------------
+ggplot(df, aes(A_ratio)) +
+  labs(title = "Country 1") +
+  # Technology-growth locus (static)
+  geom_line(aes(y = gA), colour = "#002F6C", linewidth = 1.3) +
 
-Parameters: \(\beta=1/2,\;\mu_i=10,\;\gamma_{A,1}=0.2,\;\gamma_{A,2}=0.1\).
+  # Old and new steady-state lines
+  geom_hline(yintercept = steady_old, colour = "#7AA0D2", linewidth = 0.8) +
+  geom_hline(yintercept = steady_new, colour = "#7AA0D2", linewidth = 0.8) +
 
-```{r q5_numeric}
-beta <- 0.5
-gamma_leader   <- 0.2
-gamma_follower <- 0.1
-mu_i           <- 10
+  # Dashed verticals to each intersection
+  geom_vline(xintercept = old_ss, linetype = "dashed") +
+  geom_vline(xintercept = new_ss, linetype = "dashed") +
 
-ratio_star <- (gamma_leader / gamma_follower)^(1 / beta)
-g_leader    <- gamma_leader / mu_i
-g_follower  <- gamma_follower / (mu_i * ratio_star^beta)
+  # Arrow showing the upward shift
+  annotate("segment",
+           x = new_ss + 0.25, xend = new_ss + 0.25,
+           y = steady_old + 0.01, yend = steady_new - 0.01,
+           arrow = arrow(length = unit(0.18, "cm")),
+           colour = "#2a8d6f") +
 
-c(ratio_star = ratio_star,
-  g_leader    = g_leader,
-  g_follower  = g_follower)
+  # Labels
+  annotate("text", x = 3.8, y = df$gA[nrow(df)] + 0.01,
+           label = "hat(A)[2]", parse = TRUE,
+           hjust = 1, size = 4.2, colour = "#002F6C") +
+  annotate("text", x = 3.8, y = steady_old - 0.05,
+           label = "hat(A)[1]", parse = TRUE,
+           hjust = 1, size = 4.2, colour = "#7AA0D2") +
+  annotate("text", x = 3.8, y = steady_new + 0.05,
+           label = as.character(TeX("$\\hat{A}_{1}'$")), parse = TRUE,
+           hjust = 1, size = 4.2, colour = "#7AA0D2") +
+  annotate("text", x = old_ss - .25, y = steady_old - 0.10,
+           label = "Old steady\nstate", vjust = 1.1, size = 3.8) +
+  annotate("text", x = new_ss + .25, y = steady_new + 0.10,
+           label = "New steady\nstate", vjust = -0.1, size = 3.8) +
+
+  # Axes
+  scale_x_continuous(name = expression(A[1] / A[2]), limits = c(1, 4)) +
+  scale_y_continuous(
+    name   = TeX("Growth rate of technology, $\\hat{A}$"),
+    limits = c(0, y_max + 0.05), expand = c(0, 0)
+  ) +
+
+  # Theme tweaks
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.title.y     = element_text(margin = margin(r = 10))
+  )
 ```
 
-Country 1 sustains a technology level four times higher than Country 2, and both grow at \(\hat{A} = \gamma_{A,1}/\mu_i = \gamma_{A,2}/\mu_c = 2\%\) per year in the balanced path.
+```{r q5_graph_1, echo=FALSE}
+## 1.  Build the data frame ----------------------------------------------------
+# X-axis runs from 1 (normalised) out to, say, 4
+df <- tibble(A_ratio = seq(1, 4, length.out = 300)) |>
+  mutate(
+    # Original locus (light blue): a gently convex curve
+    gA1 = 0.06 + 0.18 * (A_ratio - 1) + 0.025 * (A_ratio - 1)^2,
 
-```{r q5_growth_paths, fig.cap="Question 5 – Transition of growth rates with imitation-driven convergence"}
-lambda      <- 0.18                 # speed of convergence
-T           <- 40                   # horizon in years
-ratio_0     <- 9                    # initial tech gap (leader 9× ahead)
+    # Up-shifted locus (dark blue): parallel upward move
+    gA2 = gA1 + 0.10
+  )
 
-time_grid   <- 0:(T - 1)
-ratio_path  <- ratio_star + (ratio_0 - ratio_star) * exp(-lambda * time_grid)
+# Choose a steady-state growth rate (horizontal line)
+steady <- 0.32
+steady_old <- 0.32
+steady_new <- steady_old + .10
 
-g_base      <- gamma_follower / mu_i
-g1_path     <- rep(g_leader, T)
-g2_path     <- g_base + (ratio_path / ratio_star)^beta * (g_leader - g_base)
+# Locate where each curve crosses the steady-state line
+old_ss <- with(df, approx(gA1, A_ratio, xout = steady)$y)  # old
+new_ss <- with(df, approx(gA2, A_ratio, xout = steady)$y)  # new
 
-growth_paths <- tibble(
-  year = time_grid,
-  `Country 1` = g1_path,
-  `Country 2` = g2_path,
-  `A_1/A_2`   = ratio_path
-)
+# --- Arrow coordinates: between gA1 and gA2, but above the steady line -------
+x_arrow <- new_ss + 0.25
+g1x <- with(df, approx(A_ratio, gA1, xout = x_arrow)$y)
+g2x <- with(df, approx(A_ratio, gA2, xout = x_arrow)$y)
+pad <- 0.01
+y0 <- g1x + pad  # start just above the straight line (and gA1)
+y1 <- g2x - pad                     # end just below gA2
 
-growth_paths |>
-  select(year, `Country 1`, `Country 2`) |>
-  pivot_longer(-year, names_to = "Country", values_to = "growth") |>
-  ggplot(aes(x = year, y = 100 * growth, colour = Country)) +
-  geom_line(size = 1.1) +
-  geom_hline(yintercept = 100 * g_leader, linetype = "dashed", colour = "grey40") +
-  labs(x = "Years after t = 0",
-       y = "Growth rate of technology (%)",
-       colour = NULL) +
-  theme_minimal()
+## 2.  Draw the figure ---------------------------------------------------------
+ggplot(df, aes(A_ratio)) + 
+  labs(title = "Country 2") +
+  geom_line(aes(y = gA1), colour = "#002F6C", linewidth = 1.3) +
+  geom_line(aes(y = gA2), colour = "#002F6C", linewidth = 1.3) +
+  geom_hline(yintercept = steady, colour = "#7AA0D2", linewidth = 0.7) +
+  geom_vline(xintercept = old_ss, linetype = "dashed") +
+  geom_vline(xintercept = new_ss, linetype = "dashed") +
+  annotate(
+    "segment",
+    x = x_arrow, xend = x_arrow,
+    y = y0,     yend = y1,
+    arrow = arrow(length = unit(0.18, "cm")),
+    colour = "#2a8d6f"
+  ) +
+  annotate("text", x = old_ss + .25, y = steady - 0.05,
+           label = "Old steady\nstate", vjust = 1.1, size = 3.8) +
+  annotate("text", x = new_ss - .25, y = steady + 0.15,
+           label = "New steady\nstate", vjust = 1.1, size = 3.8) +
+  annotate("text", x = 3.8, y = df$gA1[nrow(df)] - 0.15,
+         label = "hat(A)[2]",           # <-- character
+         parse = TRUE,                  # <-- tell ggplot to parse it
+         hjust = 1, size = 4.2,
+         colour = "#002F6C") +
+  annotate( "text",
+            x     = 3.8,
+            y     = df$gA2[nrow(df)] + 0.01,
+            label = as.character(TeX("$\\hat{A}_{2}'$")),
+            parse = TRUE,
+            hjust = 1, 
+            size  = 4.2,
+            colour = "#002F6C") +
+  annotate("text", x = 3.8, y = steady_old - 0.05,
+         label = "hat(A)[1]",           # <-- character
+         parse = TRUE,
+         hjust = 1, size = 4.2,
+         colour = "#7AA0D2") +
+  scale_x_continuous(name = TeX("$A_1/A_2$"), limits = c(1, 4)) +
+  scale_y_continuous(
+    name   = TeX("Growth rate of technology, $\\hat{A}$"),
+    limits = c(0, max(df$gA2) + 0.05),
+    expand = c(0, 0)
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.title.y     = element_text(margin = margin(r = 10))
+  )
+
 ```
-
-The path mirrors Figure 8.3: the leader’s growth rate stays flat at 2 %, whereas the follower initially grows faster (≈2.5 %) while the gap is wide, then gradually converges downward as imitation becomes costlier and the technology ratio tends to its steady-state value.
 
 ---
 
