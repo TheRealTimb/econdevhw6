@@ -1,6 +1,6 @@
 ---
 title: "HW #6 – ECON 4100: Economic Development"
-author: "Caleb Cayouette"
+author: "Caleb"
 date: "10/22/2025"
 output:
   pdf_document:
